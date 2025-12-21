@@ -1,0 +1,107 @@
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+#root {
+  background-color: transparent !important; /* Quan trọng: Không cho nó có màu nền */
+  width: 100%;
+  min-height: 100vh; /* Để nó cao bằng body */
+  display: flex;     /* Giữ layout không bị vỡ */
+  flex-direction: column;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-main);
+  min-height: 100vh;
+  
+  /* --- PHẦN QUAN TRỌNG NHẤT: BACKGROUND --- */
+  /* Lớp 1: Màu phủ tối (để chữ luôn đọc được) */
+  /* Lớp 2: Ảnh nền Y tế công nghệ cao */
+  background: 
+    linear-gradient(to bottom, rgba(10, 15, 30, 0.85), rgba(10, 15, 30, 0.95)),
+    url('./assets/medical_background.jpg');
+  
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* Cố định ảnh khi cuộn chuột -> Rất xịn */
+}
+
+/* --- HIỆU ỨNG KÍNH MỜ (GIỐNG MẪU CỦA BẠN) --- */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px); /* Độ mờ hậu cảnh */
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Bóng đổ sâu */
+  border-radius: 16px;
+  padding: 24px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border-color: rgba(59, 130, 246, 0.3); /* Viền sáng lên màu xanh khi hover */
+}
+
+/* --- CÁC NÚT BẤM (BUTTONS) --- */
+.btn-primary {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); /* Bóng nút màu xanh */
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); /* Phát sáng mạnh */
+}
+
+.btn-primary:disabled {
+  background: #334155;
+  color: #64748b;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* --- INPUT --- */
+.input-glass {
+  background: rgba(0, 0, 0, 0.3); /* Nền input tối hơn card */
+  border: 1px solid var(--glass-border);
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s;
+}
+
+.input-glass:focus {
+  border-color: var(--primary-color);
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* --- TYPOGRAPHY --- */
+h1, h2, h3 { 
+  margin-top: 0; 
+  font-weight: 700; 
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5); /* Bóng chữ nhẹ */
+}
+.text-highlight { color: var(--primary-color); }
+.text-muted { color: var(--text-muted); font-size: 0.9em; }
+a { color: #60a5fa; text-decoration: none; transition: color 0.2s; }
+a:hover { color: #93c5fd; text-decoration: underline; }
