@@ -8,18 +8,18 @@
   /* Màu chính - Tone xanh tối hiện đại */
   --primary-color: #3b82f6;
   --primary-dark: #2563eb;
-  --primary-light: #60a5fa;
+  --primary-light: #ffffff;
   --primary-glow: rgba(59, 130, 246, 0.3);
   
   /* Màu nền - Xanh tối gradient */
   --bg-dark: #0a0f1e;
   --bg-darker: #050812;
-  --bg-overlay: rgba(10, 15, 30, 0.85);
-  --bg-overlay-dark: rgba(5, 8, 18, 0.95);
+  --bg-overlay: rgba(10, 15, 30, 0.6);
+  --bg-overlay-dark: rgba(5, 8, 18, 0.8);
   
   /* Glass morphism */
-  --glass-bg: rgba(15, 23, 42, 0.6);
-  --glass-bg-hover: rgba(15, 23, 42, 0.8);
+  --glass-bg: rgba(15, 23, 42, 0.3);
+  --glass-bg-hover: rgba(15, 23, 42, 0.6);
   --glass-border: rgba(59, 130, 246, 0.2);
   --glass-border-hover: rgba(59, 130, 246, 0.4);
   
@@ -63,7 +63,7 @@ body {
     /* Lớp overlay gradient xanh tối */
     linear-gradient(135deg, var(--bg-overlay-dark) 0%, var(--bg-overlay) 50%, rgba(15, 23, 42, 0.9) 100%),
     /* Lớp overlay xanh tối phủ lên */
-    linear-gradient(to bottom, rgba(5, 8, 18, 0.7), rgba(10, 15, 30, 0.8)),
+    linear-gradient(to bottom, rgba(5, 8, 18, 0.7), rgba(0, 0, 0, 0.6)),
     /* Ảnh nền */
     url('./assets/medical_background.jpg');
   
@@ -419,4 +419,14 @@ a:hover {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary-color);
   background-clip: padding-box;
+}
+
+.radix-themes, #root {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Đảm bảo chiều cao full màn hình để không bị lẹm */
+html, body, #root, .radix-themes {
+  height: 100%;
 }

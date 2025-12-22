@@ -11,7 +11,7 @@ import { PACKAGE_ID, MODULE_NAME } from "./config";
 import { Toaster } from 'react-hot-toast';
 import { LayoutDashboard, User, Stethoscope, Activity, Shield } from "lucide-react";
 import { AdminDashboard } from "./AdminDashboard";
-import "./index.css"
+
 
 function App() {
   const account = useCurrentAccount();
@@ -90,7 +90,7 @@ function App() {
           fontWeight: 700
         }}>
           <Activity color="#3b82f6" size={32} /> 
-          <span>SUI Medical</span>
+          <span>NOVA MEDICAL</span>
         </h1>
         <ConnectButton />
       </nav>

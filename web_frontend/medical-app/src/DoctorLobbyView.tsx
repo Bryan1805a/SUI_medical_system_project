@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSuiClientQuery, useCurrentAccount } from "@mysten/dapp-kit";
 import { LOBBY_ID } from "./config";
-import { Users, Copy, CheckCircle, Activity, AlertTriangle } from "lucide-react";
+import { Users, Copy, CheckCircle, Activity, AlertTriangle, Stethoscope } from "lucide-react";
 import toast from "react-hot-toast";
 
 type WaitingPatient = {
@@ -11,11 +11,12 @@ type WaitingPatient = {
   priority: number | string;
 };
 
-export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address: string) => void }) {
+// 👇 Cập nhật kiểu dữ liệu: nhận thêm index (number)
+export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address: string, index: number) => void }) {
   const account = useCurrentAccount();
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
-  // Query Lobby object để lấy danh sách bệnh nhân
+  // Query Lobby object
   const { data: lobbyData } = useSuiClientQuery(
     "getObject",
     {
@@ -27,7 +28,7 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
     },
     {
       enabled: !!LOBBY_ID && LOBBY_ID !== "YOUR_LOBBY_ID_HERE",
-      refetchInterval: 5000, // Refresh mỗi 5 giây
+      refetchInterval: 3000, // Tăng tốc độ refresh lên 3s để thấy thay đổi nhanh hơn
     }
   );
 
@@ -104,14 +105,16 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
           fontWeight: 600,
           color: 'var(--primary-light)',
         }}>
-          {patientsArray.length} bệnh nhân
+          {patientsArray.length} đang chờ
         </div>
       </div>
 
       {patientsArray.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px' }}>
-          <Users size={48} color="var(--text-muted)" style={{ marginBottom: 16, opacity: 0.5 }} />
-          <p className="text-muted">Chưa có bệnh nhân nào đăng ký khám</p>
+        <div style={{ textAlign: 'center', padding: '40px', border: '1px dashed var(--glass-border)', borderRadius: 12 }}>
+          <div style={{ background: 'rgba(255,255,255,0.05)', width: 60, height: 60, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+            <Users size={30} color="var(--text-muted)" style={{ opacity: 0.5 }} />
+          </div>
+          <p className="text-muted" style={{ margin: 0 }}>Hiện tại không có bệnh nhân nào trong sảnh chờ.</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -130,34 +133,36 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
                 borderRadius: '12px',
                 transition: 'all 0.2s ease',
                 cursor: 'pointer',
+                background: 'rgba(255, 255, 255, 0.02)'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = 'var(--primary-color)';
-                e.currentTarget.style.transform = 'translateX(4px)';
+                e.currentTarget.style.background = 'rgba(59, 130, 246, 0.05)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = 'var(--glass-border)';
-                e.currentTarget.style.transform = 'translateX(0)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, flex: 1 }}>
                 <div style={{
                   width: '40px',
                   height: '40px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, var(--primary-color), var(--primary-light))',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, var(--primary-dark), var(--primary-color))',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: 'white',
                   fontWeight: 700,
                   fontSize: '1.1em',
+                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
                 }}>
                   {index + 1}
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                    <div style={{ fontWeight: 600 }}>
+                    <div style={{ fontWeight: 600, fontSize: '1.05em' }}>
                       Bệnh nhân #{index + 1}
                     </div>
                     <div
@@ -170,11 +175,11 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
                         fontSize: '0.75em',
                         border: `1px solid ${badge.borderColor}`,
                         background: badge.color,
+                        fontWeight: 600
                       }}
                     >
                       <AlertTriangle size={12} />
                       <span>{badge.label}</span>
-                      <span style={{ opacity: 0.7 }}>P{Number(patient.priority)}</span>
                     </div>
                   </div>
 
@@ -192,6 +197,7 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
                         e.stopPropagation();
                         copyToClipboard(patient.addr);
                       }}
+                      title="Copy địa chỉ"
                       style={{
                         background: 'transparent',
                         border: 'none',
@@ -211,39 +217,35 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
                     </button>
                   </div>
 
-                  <div style={{ fontSize: '0.85em', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ fontSize: '0.9em', color: 'var(--text-light)', marginTop: 4, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                     <div>
-                      <strong>Chuyên khoa:</strong> {patient.department || "N/A"}
+                      <span style={{color: 'var(--text-muted)'}}>Khoa: </span> 
+                      <strong style={{color: 'var(--primary-light)'}}>{patient.department || "N/A"}</strong>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
-                      <Activity size={14} style={{ marginTop: 2 }} />
-                      <span>
-                        <strong>Triệu chứng:</strong> {patient.symptoms || "Chưa cung cấp"}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Activity size={14} color="#f472b6" />
+                      <span style={{color: 'var(--text-main)'}}>
+                        {patient.symptoms || "Chưa cung cấp"}
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
 
+              {/* 👇 Nút này giờ sẽ gửi cả INDEX */}
               <button
                 className="btn-primary"
-                onClick={() => onSelectPatient(patient.addr)}
-                style={{ padding: '8px 16px', fontSize: '14px' }}
+                onClick={() => onSelectPatient(patient.addr, index)} 
+                style={{ padding: '10px 20px', fontSize: '14px', borderRadius: '10px' }}
               >
-                Chọn bệnh nhân
+                <Stethoscope size={16} />
+                Khám ngay
               </button>
             </div>
           );
           })}
         </div>
       )}
-
-      <div style={{ marginTop: 16, padding: '12px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', fontSize: '0.85em' }}>
-        <p style={{ margin: 0, color: 'var(--text-muted)' }}>
-          💡 <strong>Tip:</strong> Danh sách sẽ tự động cập nhật khi có bệnh nhân mới đăng ký
-        </p>
-      </div>
     </div>
   );
 }
-
