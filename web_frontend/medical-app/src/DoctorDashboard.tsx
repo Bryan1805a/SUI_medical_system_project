@@ -11,7 +11,9 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
   const [patientId, setPatientId] = useState("");
-  const [medName, setMedName] = useState("");
+  const [prescriptionName, setPrescriptionName] = useState("");
+  const [diagnosis, setDiagnosis] = useState("");
+  const [doctorName, setDoctorName] = useState("");
   
   // State mới cho xử lý file
   const [ipfsHash, setIpfsHash] = useState(""); 
@@ -35,8 +37,8 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
   };
 
   const createPrescription = () => {
-    if (!account || !patientId || !medName || !ipfsHash) {
-      toast.error("Vui lòng nhập đủ thông tin và upload đơn thuốc!");
+    if (!account || !patientId || !prescriptionName || !diagnosis || !doctorName || !ipfsHash) {
+      toast.error("Vui lòng nhập đầy đủ thông tin (tên đơn, chẩn đoán, tên bác sĩ) và upload đơn thuốc!");
       return;
     }
 
@@ -52,8 +54,11 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
     }
 
     const txb = new Transaction();
-    const nameBytes = new TextEncoder().encode(medName);
+    const nameBytes = new TextEncoder().encode(prescriptionName);
     const ipfsBytes = new TextEncoder().encode(ipfsHash);
+    const diagnosisBytes = new TextEncoder().encode(diagnosis);
+    const doctorNameBytes = new TextEncoder().encode(doctorName);
+    const timestampSeconds = Math.floor(Date.now() / 1000);
 
     txb.moveCall({
       target: `${PACKAGE_ID}::${MODULE_NAME}::create_prescription`,
@@ -62,6 +67,9 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
         txb.pure.address(patientId),
         txb.pure.vector("u8", nameBytes),
         txb.pure.vector("u8", ipfsBytes),
+        txb.pure.vector("u8", diagnosisBytes),
+        txb.pure.vector("u8", doctorNameBytes),
+        txb.pure.u64(timestampSeconds),
       ],
     });
 
@@ -72,7 +80,9 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
       {
         onSuccess: () => {
           toast.success("Đã gửi đơn thuốc thành công!", { id: loadingToast });
-          setMedName("");
+          setPrescriptionName("");
+          setDiagnosis("");
+          setDoctorName("");
           setPatientId("");
           setIpfsHash(""); 
         },
@@ -110,12 +120,33 @@ export function DoctorDashboard({ doctorCapId }: { doctorCapId: string }) {
         </div>
         
         <div>
-          <label className="text-muted" style={{ display: 'block', marginBottom: 5 }}>Chẩn đoán / Tên thuốc</label>
+          <label className="text-muted" style={{ display: 'block', marginBottom: 5 }}>Tên đơn thuốc</label>
           <input 
             className="input-glass"
-            placeholder="VD: Thuốc trị cảm cúm..." 
-            value={medName}
-            onChange={(e) => setMedName(e.target.value)}
+            placeholder="VD: Đơn thuốc cảm cúm số 1..." 
+            value={prescriptionName}
+            onChange={(e) => setPrescriptionName(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="text-muted" style={{ display: 'block', marginBottom: 5 }}>Chẩn đoán</label>
+          <textarea 
+            className="input-glass"
+            placeholder="VD: Bệnh nhân sốt 38.5 độ, đau đầu, ho khan..."
+            rows={2}
+            value={diagnosis}
+            onChange={(e) => setDiagnosis(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="text-muted" style={{ display: 'block', marginBottom: 5 }}>Tên bác sĩ</label>
+          <input 
+            className="input-glass"
+            placeholder="VD: BS. Nguyễn Văn A"
+            value={doctorName}
+            onChange={(e) => setDoctorName(e.target.value)}
           />
         </div>
 

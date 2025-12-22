@@ -1,15 +1,22 @@
 import { useState } from "react";
 import { useSuiClientQuery, useCurrentAccount } from "@mysten/dapp-kit";
-import { PACKAGE_ID, MODULE_NAME, LOBBY_ID } from "./config";
-import { Users, Copy, CheckCircle } from "lucide-react";
-import toast from 'react-hot-toast';
+import { LOBBY_ID } from "./config";
+import { Users, Copy, CheckCircle, Activity, AlertTriangle } from "lucide-react";
+import toast from "react-hot-toast";
+
+type WaitingPatient = {
+  addr: string;
+  symptoms: string;
+  department: string;
+  priority: number | string;
+};
 
 export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address: string) => void }) {
   const account = useCurrentAccount();
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
   // Query Lobby object để lấy danh sách bệnh nhân
-  const { data: lobbyData, refetch } = useSuiClientQuery(
+  const { data: lobbyData } = useSuiClientQuery(
     "getObject",
     {
       id: LOBBY_ID || "",
@@ -18,7 +25,7 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
         showOwner: true,
       },
     },
-    { 
+    {
       enabled: !!LOBBY_ID && LOBBY_ID !== "YOUR_LOBBY_ID_HERE",
       refetchInterval: 5000, // Refresh mỗi 5 giây
     }
@@ -35,6 +42,28 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
+  const getPriorityBadge = (priority: number) => {
+    if (priority >= 4) {
+      return {
+        label: "Khẩn cấp",
+        color: "rgba(239,68,68,0.15)",
+        borderColor: "#ef4444",
+      };
+    }
+    if (priority === 3) {
+      return {
+        label: "Ưu tiên",
+        color: "rgba(234,179,8,0.1)",
+        borderColor: "#eab308",
+      };
+    }
+    return {
+      label: "Thường",
+      color: "rgba(34,197,94,0.1)",
+      borderColor: "#22c55e",
+    };
+  };
+
   if (!LOBBY_ID || LOBBY_ID === "YOUR_LOBBY_ID_HERE") {
     return (
       <div className="glass-card fade-in">
@@ -48,8 +77,18 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
     );
   }
 
-  const patients = lobbyData?.data?.content?.fields?.patients || [];
-  const patientsArray = Array.isArray(patients) ? patients : [];
+  const rawPatients = lobbyData?.data?.content?.fields?.patients || [];
+  const patientsArray: WaitingPatient[] = Array.isArray(rawPatients)
+    ? rawPatients.map((p: any) => {
+        const fields = p?.fields ?? p?.data?.fields ?? p;
+        return {
+          addr: fields.addr,
+          symptoms: fields.symptoms,
+          department: fields.department,
+          priority: Number(fields.priority),
+        };
+      })
+    : [];
 
   return (
     <div className="glass-card fade-in">
@@ -76,9 +115,11 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {patientsArray.map((patientAddress: string, index: number) => (
-            <div
-              key={`${patientAddress}-${index}`}
+          {patientsArray.map((patient: WaitingPatient, index: number) => {
+            const badge = getPriorityBadge(Number(patient.priority));
+            return (
+              <div
+              key={`${patient.addr}-${index}`}
               className="glass-card"
               style={{
                 padding: '16px',
@@ -99,7 +140,7 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
                 e.currentTarget.style.transform = 'translateX(0)';
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flex: 1 }}>
                 <div style={{
                   width: '40px',
                   height: '40px',
@@ -114,10 +155,29 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
                 }}>
                   {index + 1}
                 </div>
-                <div>
-                  <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                    Bệnh nhân #{index + 1}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                    <div style={{ fontWeight: 600 }}>
+                      Bệnh nhân #{index + 1}
+                    </div>
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '4px 10px',
+                        borderRadius: 999,
+                        fontSize: '0.75em',
+                        border: `1px solid ${badge.borderColor}`,
+                        background: badge.color,
+                      }}
+                    >
+                      <AlertTriangle size={12} />
+                      <span>{badge.label}</span>
+                      <span style={{ opacity: 0.7 }}>P{Number(patient.priority)}</span>
+                    </div>
                   </div>
+
                   <div style={{ 
                     fontFamily: 'monospace', 
                     fontSize: '0.9em',
@@ -126,11 +186,11 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
                     alignItems: 'center',
                     gap: 8,
                   }}>
-                    {formatAddress(patientAddress)}
+                    {formatAddress(patient.addr)}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        copyToClipboard(patientAddress);
+                        copyToClipboard(patient.addr);
                       }}
                       style={{
                         background: 'transparent',
@@ -139,29 +199,42 @@ export function DoctorLobbyView({ onSelectPatient }: { onSelectPatient: (address
                         padding: '4px',
                         display: 'flex',
                         alignItems: 'center',
-                        color: copiedAddress === patientAddress ? 'var(--primary-color)' : 'var(--text-muted)',
+                        color: copiedAddress === patient.addr ? 'var(--primary-color)' : 'var(--text-muted)',
                         transition: 'color 0.2s',
                       }}
                     >
-                      {copiedAddress === patientAddress ? (
+                      {copiedAddress === patient.addr ? (
                         <CheckCircle size={14} />
                       ) : (
                         <Copy size={14} />
                       )}
                     </button>
                   </div>
+
+                  <div style={{ fontSize: '0.85em', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div>
+                      <strong>Chuyên khoa:</strong> {patient.department || "N/A"}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                      <Activity size={14} style={{ marginTop: 2 }} />
+                      <span>
+                        <strong>Triệu chứng:</strong> {patient.symptoms || "Chưa cung cấp"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               <button
                 className="btn-primary"
-                onClick={() => onSelectPatient(patientAddress)}
+                onClick={() => onSelectPatient(patient.addr)}
                 style={{ padding: '8px 16px', fontSize: '14px' }}
               >
                 Chọn bệnh nhân
               </button>
             </div>
-          ))}
+          );
+          })}
         </div>
       )}
 

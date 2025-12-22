@@ -9,7 +9,8 @@ import { TransactionHistory } from "./TransactionHistory";
 import { FindContractIds } from "./FindContractIds";
 import { PACKAGE_ID, MODULE_NAME } from "./config";
 import { Toaster } from 'react-hot-toast';
-import { LayoutDashboard, User, Stethoscope, Activity } from "lucide-react";
+import { LayoutDashboard, User, Stethoscope, Activity, Shield } from "lucide-react";
+import { AdminDashboard } from "./AdminDashboard";
 import "./index.css"
 
 function App() {
@@ -36,13 +37,24 @@ function App() {
     { enabled: !!account }
   );
 
+  // Query 3: Check Admin
+  const { data: adminData } = useSuiClientQuery(
+    "getOwnedObjects",
+    {
+      owner: account?.address || "",
+      filter: { StructType: `${PACKAGE_ID}::${MODULE_NAME}::AdminCap` },
+    },
+    { enabled: !!account }
+  );
+
   const patientRecord = patientData?.data?.[0];
   const doctorCap = doctorData?.data?.[0];
+  const adminCap = adminData?.data?.[0];
 
-  // Tự động chuyển sang tab Bác sĩ nếu phát hiện có DoctorCap
+  // Tự động chuyển sang tab Bác sĩ nếu phát hiện có DoctorCap (nhưng không override Admin)
   useEffect(() => {
-    if (doctorCap) setActiveTab("doctor");
-  }, [doctorCap]);
+    if (doctorCap && !adminCap) setActiveTab("doctor");
+  }, [doctorCap, adminCap]);
 
   return (
     <div className="container" style={{ paddingTop: 30, paddingBottom: 100 }}>
@@ -131,6 +143,16 @@ function App() {
                    <Stethoscope size={18} /> Cổng Bác Sĩ
                  </button>
               )}
+
+              {/* Chỉ hiện tab Admin nếu có AdminCap */}
+              {adminCap && (
+                 <button 
+                   onClick={() => setActiveTab('admin')}
+                   className={`tab-button ${activeTab === 'admin' ? 'active' : ''}`}
+                 >
+                   <Shield size={18} /> Cổng Admin
+                 </button>
+              )}
             </div>
 
             {/* 3. NỘI DUNG CHÍNH (Thay đổi theo Tab) */}
@@ -174,6 +196,13 @@ function App() {
               {activeTab === 'doctor' && doctorCap && (
                 <div className="fade-in">
                   <DoctorDashboard doctorCapId={doctorCap.data?.objectId!} />
+                </div>
+              )}
+
+              {/* === TAB ADMIN === */}
+              {activeTab === 'admin' && adminCap && (
+                <div className="fade-in">
+                  <AdminDashboard adminCapId={adminCap.data?.objectId!} />
                 </div>
               )}
             </div>
