@@ -103,7 +103,7 @@ function App() {
             maxWidth: 600,
             margin: "0 auto"
           }}>
-            <h2 style={{ marginBottom: 16 }}>👋 Chào mừng đến với hệ thống Y tế Web3</h2>
+            <h2 style={{ marginBottom: 16 }}>👋 Chào mừng đến với hệ thống Y tế HealthTrust</h2>
             <p className="text-muted" style={{ fontSize: '1.1em', marginBottom: 0 }}>
               Vui lòng kết nối ví Sui để tiếp tục
             </p>
