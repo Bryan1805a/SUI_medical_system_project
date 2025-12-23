@@ -1,0 +1,25 @@
+* [33m4bbc4a3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Updated frontend
+[31m|[m * [33m39a09a8[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Fix markdown syntax for git clone command
+[31m|[m * [33m61a46ca[m Update repository clone and directory paths in README
+[31m|[m * [33ma84afbd[m Update README with installation and configuration steps
+[31m|[m[31m/[m  
+* [33mb3c2155[m Changed README.md content
+* [33m0449428[m Changed small things
+* [33mb56fe3e[m Deleted tsc
+* [33m2f52f5e[m Redeployed smart contract + updated UI + init AdminCap
+* [33mb7a6abd[m Deployed new smart contract
+* [33mff0f4ea[m Init AdminDashboard and updated UI
+* [33m381bc23[m .
+* [33m1ebe294[m Updated UI
+* [33m51dd6ea[m Changed miscellaneous things
+* [33m76435d2[m Created prescription
+* [33m024942f[m Created patient profile
+* [33m1d2796b[m Created doctor UI
+* [33mde564b6[m Created doctor profiled
+* [33m9535c1e[m Setup devnet Network
+* [33m4c03917[m Deployed smart contract
+* [33m4c33e78[m .
+* [33mb40dc61[m Changed some small things
+* [33m0f306c0[m Init frontend
+* [33m5b7ecaf[m Initial project setup: Move and Frontend
+* [33m0e4e95b[m Initial commit
