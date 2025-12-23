@@ -72,14 +72,16 @@ Follow these steps to run the project on your machine.
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/YOUR_USERNAME/SUI_medical_system_project.git](https://github.com/YOUR_USERNAME/SUI_medical_system_project.git)
+git clone https://github.com/Bryan1805a/SUI_medical_system_project.git
 cd SUI_medical_system_project
+```
 
 ### 2. Install Frontend Dependencies
 Navigate to the frontend folder (e.g., web_frontend or client): 
 ```bash
-cd web_frontend
+cd web_frontend\medical-app
 npm install
+```
 
 ### 3. Configure Environment
 Create or update src/config.ts with your Contract IDs (or use the provided default ones):
@@ -89,10 +91,12 @@ export const PACKAGE_ID = "0x..."; // Your deployed Package ID
 export const ADMIN_CAP_ID = "0x..."; // Your AdminCap ID
 export const LOBBY_ID = "0x..."; // Your Shared Lobby ID
 export const PINATA_JWT = "YOUR_PINATA_KEY"; // Optional for upload feature
+```
 
 ### 4. Run the dApp
 ```bash
 npm run dev
+```
 
 Open http://localhost:5173 in your browser.
 
@@ -102,10 +106,13 @@ Open http://localhost:5173 in your browser.
 If you want to deploy your own version of the contract:
 ### 1. Navigate to the Move folder:
 ```bash
-cd medical_system
+cd sui_contracts\medical_system
+```
 
 ### 2. Publish to Testnet:
+```bash
 sui client publish --gas-budget 100000000
+```
 
 ### 3. Copy the new Package ID, Lobby ID, and AdminCap ID into src/config.ts.
 
